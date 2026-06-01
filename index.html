@@ -1497,8 +1497,44 @@ body::after {
 /* ===== AUDIO ===== */
 let audioCtx = null;
 let audioOn = true;
+let silentAudio = null;
 
 function initAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+
+// Mobile fix: Web Audio alone runs in the "ambient" session, which iOS mutes via the
+// silent switch and which Android can route to low-quality BT HFP. A looping silent
+// <audio> element flips the page to a media-playback session so notes are audible
+// through speakers and earphones.
+function ensureSilentAudio() {
+  if (silentAudio) return silentAudio;
+  const sampleRate = 22050, samples = 11025, dataSize = samples * 2;
+  const buf = new ArrayBuffer(44 + dataSize);
+  const v = new DataView(buf);
+  let p = 0;
+  const ws = s => { for (const c of s) v.setUint8(p++, c.charCodeAt(0)); };
+  const wu32 = n => { v.setUint32(p, n, true); p += 4; };
+  const wu16 = n => { v.setUint16(p, n, true); p += 2; };
+  ws('RIFF'); wu32(36 + dataSize); ws('WAVE');
+  ws('fmt '); wu32(16); wu16(1); wu16(1);
+  wu32(sampleRate); wu32(sampleRate * 2); wu16(2); wu16(16);
+  ws('data'); wu32(dataSize);
+  silentAudio = document.createElement('audio');
+  silentAudio.src = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  silentAudio.loop = true;
+  silentAudio.setAttribute('playsinline', '');
+  silentAudio.setAttribute('webkit-playsinline', '');
+  silentAudio.preload = 'auto';
+  silentAudio.style.cssText = 'position:absolute;left:-9999px;width:1px;height:1px;opacity:0;';
+  document.body.appendChild(silentAudio);
+  return silentAudio;
+}
+
+function unlockAudio() {
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  const sa = ensureSilentAudio();
+  if (sa.paused) sa.play().catch(() => {});
+}
 
 function pluckBass(freq = 55, vel = 1) {
   if (!audioOn) return;
@@ -1525,15 +1561,18 @@ function pluckBass(freq = 55, vel = 1) {
 }
 
 function primeAudio() {
-  initAudio();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+  unlockAudio();
   document.removeEventListener('pointerdown', primeAudio);
   document.removeEventListener('keydown', primeAudio);
   document.removeEventListener('mousemove', primeAudio);
+  document.removeEventListener('touchstart', primeAudio);
+  document.removeEventListener('touchend', primeAudio);
 }
 document.addEventListener('pointerdown', primeAudio, { once: true });
 document.addEventListener('keydown', primeAudio, { once: true });
 document.addEventListener('mousemove', primeAudio, { once: true });
+document.addEventListener('touchstart', primeAudio, { once: true });
+document.addEventListener('touchend', primeAudio, { once: true });
 
 /* ===== HOVER ===== */
 const world = document.getElementById('world');
@@ -1691,8 +1730,7 @@ if (soundToggle) {
     soundToggle.querySelector('.label').textContent = audioOn ? 'sound on' : 'sound off';
     if (audioOn) {
       catWrap.classList.remove('crying');
-      initAudio();
-      if (audioCtx.state === 'suspended') audioCtx.resume();
+      unlockAudio();
       [41.20, 55.00, 73.42, 98.00].forEach((f, i) => setTimeout(() => pluckBass(f), i * 180));
     } else {
       catWrap.classList.add('crying');
