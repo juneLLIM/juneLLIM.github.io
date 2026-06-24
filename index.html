@@ -272,6 +272,8 @@ body::after {
   letter-spacing: 0.02em;
   display: inline-block;
 }
+.card h2 .h2-sub { font-size: 1.05rem; color: var(--ink-soft); opacity: 0.8; letter-spacing: 0.01em; }
+.card h2 .h2-sub.nl { display: block; margin-top: 0.18rem; }   /* long full name -> its own line */
 
 .card ul { list-style: none; }
 .card ul li {
@@ -345,15 +347,19 @@ body::after {
 
 .proj-title a.ico {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 22px; height: 22px;
+  gap: 3px;
   color: var(--amber);
   border: none;
   opacity: 0.7;
   transition: opacity 0.3s var(--ease-soft), transform 0.4s var(--ease);
 }
 .proj-title a.ico svg { width: 22px; height: 22px; }
+.proj-title a.ico .ico-cap {     /* small caption telling where the icon links */
+  font-family: 'Pixelify Sans', system-ui, sans-serif;
+  font-size: 0.46rem; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1;
+}
 .proj-title a.ico:hover { opacity: 1; transform: translateY(-1px); }
 .proj-title .img-ico { display: inline-flex; align-items: center; }
 .proj-title .img-ico img { width: 22px; height: 22px; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 3px; }
@@ -367,14 +373,15 @@ body::after {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, 0);
-  margin-top: 185px;
+  margin-top: 166px;
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   font-size: 0.78rem; letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-soft);
   cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 0; line-height: 0.98;
   background: none;
-  padding: 0.45rem 0.9rem;
+  padding: 0.3rem 0.9rem;
   border: 1px solid var(--ink-mute);
   border-radius: 999px;
   transition: all 0.3s ease;
@@ -382,9 +389,20 @@ body::after {
 }
 .sound-chip:hover { border-color: var(--ink); color: var(--ink); }
 .sound-chip.on { border-color: var(--amber); color: var(--amber); }
+.spatial-tag {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, 0);
+  margin-top: 205px;                 /* sits just BELOW the sound-chip (which is at +166px) */
+  font-family: 'Pixelify Sans', system-ui, sans-serif;
+  font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
+  color: var(--ink-soft); z-index: 80; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.spatial-tag .hp-ico { width: 15px; height: 15px; flex: none; opacity: 0.9; }
+.sound-chip .chip-top { font-size: 0.72em; opacity: 0.62; letter-spacing: 0.2em; }   /* small "spatial" on top */
+.sound-chip .chip-state { display: inline-flex; align-items: center; }
 .sound-chip .dot {
   display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-  background: currentColor; margin-right: 0.45rem; vertical-align: middle;
+  background: currentColor; margin-right: 0.45rem;
   opacity: 0.4;
 }
 .sound-chip.on .dot { opacity: 1; animation: pulseDot 1.2s ease-in-out infinite; }
@@ -1254,8 +1272,12 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
       </a>
     </nav>
 
-    <button class="sound-chip on" id="soundToggle" aria-label="Toggle sound">
-      <span class="dot"></span><span class="label">sound on</span>
+    <span class="spatial-tag">
+      <svg class="hp-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-3v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/></svg><span>best in headphones</span>
+    </span>
+    <button class="sound-chip on" id="soundToggle" aria-label="Toggle spatial sound">
+      <span class="chip-top">spatial</span>
+      <span class="chip-state"><span class="dot"></span><span class="label">sound on</span></span>
     </button>
 
     <!-- Music notes are rendered on the rotatable 3D sphere (#scene canvas).
@@ -1311,7 +1333,7 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
     </article>
 
     <article class="card" data-card="acouxsplat">
-      <h2>AcouXSplat</h2>
+      <h2>AcouXSplat <span class="h2-sub nl">Acoustic Explicit Splatting for Room Impulse Responses</span></h2>
       <ul>
         <li>
           <span>
@@ -1321,14 +1343,16 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
                   <rect width="32" height="32" rx="6" fill="#1d2a4e"/>
                   <circle cx="16" cy="16" r="4" fill="#ee9b1c"/>
                 </svg>
+                <span class="ico-cap">demo</span>
               </a>
               <a class="ico gh-ico" href="https://github.com/juneLLIM/AcouXSplat" target="_blank" rel="noopener" aria-label="GitHub repo">
                 <svg viewBox="0 0 24 24">
                   <path fill="currentColor" d="M12 2 C6.5 2 2 6.5 2 12 c0 4.4 2.9 8.1 6.9 9.4 .5.1.7-.2.7-.5 v-1.7 c-2.8.6-3.4-1.3-3.4-1.3 -.5-1.1-1.1-1.4-1.1-1.4 -.9-.6.1-.6.1-.6 1 .1 1.5.9 1.5.9 .9 1.5 2.3 1.1 2.9.8 .1-.6.3-1.1.6-1.3 -2.2-.2-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7 -.1-.2-.4-1.2.1-2.5 0 0 .8-.3 2.7 1 .8-.2 1.6-.3 2.5-.3 .8 0 1.7.1 2.5.3 1.9-1.3 2.7-1 2.7-1 .5 1.3.2 2.3.1 2.5 .6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .3.3.7.9.7 1.8 v 2.6 c0 .3.2.6.7.5 4-1.3 6.9-5 6.9-9.4 0-5.5-4.5-10-10-10 Z"/>
                 </svg>
+                <span class="ico-cap">code</span>
               </a>
             </span>
-            <span class="role">Anticipated Master's thesis · Acoustic Explicit Splatting for Room Impulse Responses — adapts 3D Gaussian Splatting to acoustic rendering to predict RIRs at unseen receivers (MeshRIR, TAU-SRIR DB)</span>
+            <span class="role">Anticipated Master's thesis · adapts 3D Gaussian Splatting to acoustic rendering to predict RIRs at unseen receivers (MeshRIR, TAU-SRIR DB)</span>
           </span>
           <span class="yrs">2026</span>
         </li>
@@ -1336,7 +1360,7 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
     </article>
 
     <article class="card" data-card="spatialrhythm">
-      <h2>Dudum Chit</h2>
+      <h2>Dudum Chit <span class="h2-sub">spatial DDR</span></h2>
       <ul>
         <li>
           <span>
@@ -1396,6 +1420,7 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
 <script>
 /* ===== AUDIO ===== */
 let audioCtx = null;
+const voices = [];        // ringing spatial plucks whose pan follows their note as the sphere rotates
 let audioOn = true;
 let silentAudio = null;
 
@@ -1436,11 +1461,15 @@ function unlockAudio() {
   if (sa.paused) sa.play().catch(() => {});
 }
 
-function pluckBass(freq = 55, vel = 1) {
+// pan/depth spatialise the pluck by the source's position relative to the cat (the listener at centre):
+//   pan  = horizontal offset  [-1 left .. +1 right]    depth = +1 near/front .. -1 far/behind
+function pluckBass(freq = 55, vel = 1, pan = 0, depth = 1, src = null) {
   if (!audioOn) return;
   if (!audioCtx) initAudio();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   const ctx = audioCtx, now = ctx.currentTime, dur = 1.3;
+  const dv = (Math.max(-1, Math.min(1, depth)) + 1) * 0.5;   // 0 = far/behind, 1 = near/front
+  const volS = 0.5 + 0.5*dv, cutTop = 700 + 1500*dv;         // behind the listener -> quieter + more muffled
   const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), o3 = ctx.createOscillator();
   const g = ctx.createGain(), lp = ctx.createBiquadFilter();
   lp.type = 'lowpass'; lp.Q.value = 1.2;
@@ -1450,11 +1479,15 @@ function pluckBass(freq = 55, vel = 1) {
   const m1 = ctx.createGain(), m2 = ctx.createGain(), m3 = ctx.createGain();
   m1.gain.value = 0.6 * vel; m2.gain.value = 0.18 * vel; m3.gain.value = 0.12 * vel;
   o1.connect(m1).connect(lp); o2.connect(m2).connect(lp); o3.connect(m3).connect(lp);
-  lp.connect(g).connect(ctx.destination);
+  lp.connect(g);
+  if (ctx.createStereoPanner){ const pn = ctx.createStereoPanner();   // azimuth: left/right by horizontal position
+    pn.pan.value = Math.max(-1, Math.min(1, pan)); g.connect(pn).connect(ctx.destination);
+    if (src) voices.push({ src, pan: pn, end: now + dur }); }   // track it so the pan ROTATES with the sphere while it rings
+  else g.connect(ctx.destination);
   g.gain.setValueAtTime(0, now);
-  g.gain.linearRampToValueAtTime(0.32 * vel, now + 0.005);
+  g.gain.linearRampToValueAtTime(0.32 * vel * volS, now + 0.005);
   g.gain.exponentialRampToValueAtTime(0.001, now + dur);
-  lp.frequency.setValueAtTime(2200, now);
+  lp.frequency.setValueAtTime(cutTop, now);
   lp.frequency.exponentialRampToValueAtTime(280, now + dur * 0.8);
   o1.start(now); o2.start(now); o3.start(now);
   o1.stop(now + dur); o2.stop(now + dur); o3.stop(now + dur);
@@ -1985,7 +2018,7 @@ const catNotes = [41.20, 55.00, 73.42, 98.00, 82.41, 61.74];
 let catIdx = 0;
 function activateNote(n){
   show(n.card);
-  pluckBass(n.freq);
+  pluckBass(n.freq, 1, n.nx, n.nz, n);   // spatialised by the note's position; pan follows it as the sphere turns
   pushPing(n.pos, PAMP_INTERACT);  // note tap (interaction) -> biggest; interferes with the cat's
 }
 function catPlay(){
@@ -2025,7 +2058,7 @@ function handleTap(x, y){
   // click in empty space: launch a wave packet from that point, stored in the sphere's
   // object space so it rotates with everything else; it interferes with the cat & notes
   pushPing(matVecT(R, [(x-cx)/scale, (cy-y)/scale, 0]), PAMP_INTERACT);   // click (interaction) -> biggest
-  pluckBass(55, 0.6);
+  pluckBass(55, 0.6, (x-cx)/scale, 1);    // panned to where you clicked (relative to the cat)
   eraseHint('hintTap');                     // a tap/ripple was made -> drop the "tap to ripple" hint
   if (activeName){ clearTimeout(hideTimer); closeCards(); }
 }
@@ -2080,7 +2113,7 @@ function updateHover(){
       hoverNote = best;
       eraseHint('hintHover');               // a note was hovered -> drop the "hover a note" hint
       // don't re-pluck/re-show a note whose card is already open (e.g. it wobbled in/out under the cursor)
-      if (best.card !== activeName){ pluckBass(best.freq, 0.55); pushPing(best.pos, PAMP_INTERACT); show(best.card); }
+      if (best.card !== activeName){ pluckBass(best.freq, 0.55, best.nx, best.nz, best); pushPing(best.pos, PAMP_INTERACT); show(best.card); }
     } else { hoverNote = null; hide(); }
   }
 }
@@ -2131,6 +2164,12 @@ function frame(now){
   drawSphere();            // clears the #scene canvas
   drawNotes();
   updateHover();
+  if (voices.length && audioCtx){          // spatial sound rotates WITH the sphere: glide each ringing pluck's pan to its note's live position
+    const ct = audioCtx.currentTime;
+    for (let i=voices.length-1; i>=0; i--){ const v = voices[i];
+      if (ct >= v.end){ voices.splice(i,1); continue; }
+      v.pan.pan.setTargetAtTime(Math.max(-1, Math.min(1, v.src.nx)), ct, 0.05); }
+  }
   if (activeName) positionCard(activeName);
   // keep animating while there is motion; otherwise idle (reduced-motion users) and resume on interaction
   const busy = !reduceMotion || ptr.down || !!activeName
