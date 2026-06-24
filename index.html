@@ -113,7 +113,7 @@ body::after {
   position: relative;
   width: 100%; height: 100%;
   transform-origin: 50% 100%;
-  animation: catBob 0.85s steps(2, jump-end) infinite;
+  animation: catBob 1.1s steps(2, jump-end) infinite;
 }
 @keyframes catBob {
   0%, 49%   { transform: translateY(0) rotate(-1deg); }
@@ -147,14 +147,14 @@ body::after {
 }
 /* When crying, slow the bounce, sadder pace */
 .cat-wrap.crying .cat-body-wrap {
-  animation-duration: 1.6s !important;
+  animation-duration: 2.0s !important;
 }
 .cat-wrap:hover { z-index: 10; }
 .cat-wrap:hover .cat-body-wrap {
-  animation-duration: 0.5s;
+  animation-duration: 0.65s;
 }
 .cat-wrap.crying:hover .cat-body-wrap {   /* sad cat speeds up slightly on hover (but still slower than happy) */
-  animation-duration: 1.2s !important;
+  animation-duration: 1.5s !important;
 }
 
 /* Click burst ripple */
@@ -202,12 +202,12 @@ body::after {
 
 /* arm wave only — no body bounce */
 .cat-svg .cat-arm {
-  animation: armWave 0.85s ease-in-out infinite;   /* matches the catBob bounce period */
+  animation: armWave 1.1s ease-in-out infinite;   /* matches the catBob bounce period */
   transform-origin: 60px 300px;
 }
-.cat-wrap:hover .cat-svg .cat-arm { animation-duration: 0.5s; }         /* matches the sped-up bounce on hover */
-.cat-wrap.crying .cat-svg .cat-arm { animation-duration: 1.6s; }        /* matches the slow sad bounce */
-.cat-wrap.crying:hover .cat-svg .cat-arm { animation-duration: 1.2s; }  /* sad cat, slight hover speed-up */
+.cat-wrap:hover .cat-svg .cat-arm { animation-duration: 0.65s; }         /* matches the sped-up bounce on hover */
+.cat-wrap.crying .cat-svg .cat-arm { animation-duration: 2.0s; }        /* matches the slow sad bounce */
+.cat-wrap.crying:hover .cat-svg .cat-arm { animation-duration: 1.5s; }  /* sad cat, slight hover speed-up */
 @keyframes armWave {
   0%, 100% { transform: translateY(-4px) rotate(-4deg); }
   50%      { transform: translateY(5px) rotate(5deg); }
@@ -1755,11 +1755,11 @@ const FIELD_FS = [
   '    T    *= (1.0 - (dens + densX)*0.45);',
   '    if (T < 0.02) break;',
   '  }',
-  '  float bright = clamp(acc*0.38, 0.0, 1.0) * uGain;',    // amber wave brightness (scaled by sound state)
-  '  float xlev   = clamp(accX*0.6, 0.0, 1.0) * uGain;',    // interference energy 0..1
+  '  float bright = clamp(acc*0.26, 0.0, 1.0) * uGain;',    // amber wave brightness (scaled by sound state)
+  '  float xlev   = clamp(accX*0.5, 0.0, 1.0) * uGain;',    // interference energy 0..1
   '  vec3  hotC   = mix(vec3(1.0,0.80,0.42), vec3(1.0,0.97,0.90), smoothstep(0.2, 0.95, xlev));',  // blackbody-ish: gold -> white as energy rises
   '  vec3  col    = vec3(0.902,0.725,0.361)*bright + hotC*xlev;', // amber wavefronts + a physical hot spot where they reinforce
-  '  float a      = clamp(acc*0.26 + xlev*0.45, 0.0, 1.0) * uGain;',
+  '  float a      = clamp(acc*0.18 + xlev*0.35, 0.0, 1.0) * uGain;',
   '  gl_FragColor = vec4(col, a);',                  // premultiplied
   '}'
 ].join('\n');
@@ -2170,11 +2170,11 @@ function frame(now){
   }
   if ((++fcount % 600) === 0) R = orthonormalize(R);
   if (!reduceMotion){                  // pulses generate on every cat bounce whether sound is ON or OFF; when off the
-    const period = audioOn ? (catHover ? 0.5 : 0.85) : (catHover ? 1.2 : 1.6);   // mirrors the catBob durations in every state
+    const period = audioOn ? (catHover ? 0.65 : 1.1) : (catHover ? 1.5 : 2.0);   // mirrors the catBob durations in every state
     catAcc += dt;
     if (catAcc > period){ catAcc -= period; pushPing([0,0,0], PAMP_CAT); }
-    noteAcc += dt;                      // notes fire at TWICE the cat cadence, cycling through the notes (with a random spread)
-    const noteEvery = period * 2 * noteMul;
+    noteAcc += dt;                      // notes fire at 3x the cat cadence, cycling through the notes (with a random spread)
+    const noteEvery = period * 3 * noteMul;
     if (noteAcc > noteEvery){ noteAcc -= noteEvery; pushPing(NOTES[catBeat % NOTES.length].pos, PAMP_NOTE); catBeat++;
       noteMul = 1 + (Math.random()*2 - 1) * 0.4; }   // ±40% random spread on the next note interval
   }
