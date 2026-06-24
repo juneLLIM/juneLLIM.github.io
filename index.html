@@ -27,6 +27,7 @@
   --amber: #E6B95C;
   --amber-soft: #F2CE83;
   --amber-deep: #C9952A;
+  --cream: #F4E8CE;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -350,9 +351,9 @@ body::after {
   flex-direction: column;
   align-items: center;
   gap: 3px;
-  color: var(--amber);
+  color: var(--cream);
   border: none;
-  opacity: 0.7;
+  opacity: 1;
   transition: opacity 0.3s var(--ease-soft), transform 0.4s var(--ease);
 }
 .proj-title a.ico svg { width: 22px; height: 22px; }
@@ -360,7 +361,7 @@ body::after {
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   font-size: 0.46rem; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1;
 }
-.proj-title a.ico:hover { opacity: 1; transform: translateY(-1px); }
+.proj-title a.ico:hover { opacity: 1; transform: translateY(-1px); color: var(--amber); }
 .proj-title .img-ico { display: inline-flex; align-items: center; }
 .proj-title .img-ico img { width: 22px; height: 22px; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 3px; }
 
