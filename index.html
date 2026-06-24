@@ -373,7 +373,7 @@ body::after {
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, 0);
-  margin-top: 166px;
+  margin-top: 154px;
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   font-size: 0.78rem; letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -391,7 +391,7 @@ body::after {
 .sound-chip.on { border-color: var(--amber); color: var(--amber); }
 .spatial-tag {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, 0);
-  margin-top: 205px;                 /* sits just BELOW the sound-chip (which is at +166px) */
+  margin-top: 193px;                 /* sits just BELOW the sound-chip (which is at +154px) */
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;
   color: var(--ink-soft); z-index: 80; pointer-events: none;
@@ -1754,11 +1754,11 @@ const FIELD_FS = [
   '    T    *= (1.0 - (dens + densX)*0.45);',
   '    if (T < 0.02) break;',
   '  }',
-  '  float bright = clamp(acc*0.55, 0.0, 1.0) * uGain;',    // amber wave brightness (scaled by sound state)
-  '  float xlev   = clamp(accX*0.9, 0.0, 1.0) * uGain;',    // interference energy 0..1
+  '  float bright = clamp(acc*0.38, 0.0, 1.0) * uGain;',    // amber wave brightness (scaled by sound state)
+  '  float xlev   = clamp(accX*0.6, 0.0, 1.0) * uGain;',    // interference energy 0..1
   '  vec3  hotC   = mix(vec3(1.0,0.80,0.42), vec3(1.0,0.97,0.90), smoothstep(0.2, 0.95, xlev));',  // blackbody-ish: gold -> white as energy rises
   '  vec3  col    = vec3(0.902,0.725,0.361)*bright + hotC*xlev;', // amber wavefronts + a physical hot spot where they reinforce
-  '  float a      = clamp(acc*0.32 + xlev*0.5, 0.0, 1.0) * uGain;',
+  '  float a      = clamp(acc*0.26 + xlev*0.45, 0.0, 1.0) * uGain;',
   '  gl_FragColor = vec4(col, a);',                  // premultiplied
   '}'
 ].join('\n');
@@ -1916,6 +1916,14 @@ function avgColor(img){             // representative colour of an icon image ->
     return a ? [Math.round(r/a), Math.round(g/a), Math.round(b/a)] : null;
   }catch(e){ return null; }
 }
+function convexHull(pts){   // 2D monotone-chain hull over {sx,sy} points -> the silhouette outline
+  if (pts.length < 3) return pts.slice();
+  const ps = pts.slice().sort((a,b) => a.sx - b.sx || a.sy - b.sy);
+  const crs = (o,a,b) => (a.sx-o.sx)*(b.sy-o.sy) - (a.sy-o.sy)*(b.sx-o.sx);
+  const lo = []; for (const p of ps){ while (lo.length>=2 && crs(lo[lo.length-2],lo[lo.length-1],p)<=0) lo.pop(); lo.push(p); }
+  const up = []; for (let i=ps.length-1;i>=0;i--){ const p=ps[i]; while (up.length>=2 && crs(up[up.length-2],up[up.length-1],p)<=0) up.pop(); up.push(p); }
+  lo.pop(); up.pop(); return lo.concat(up);
+}
 function drawNoteObject(ctx, n){
   const lit  = (hoverNote===n || activeName===n.card);
   const g    = lit ? 1.15 : 1.0;
@@ -1941,9 +1949,11 @@ function drawNoteObject(ctx, n){
       return [ nW[0]*t + a, nW[1]*t + b, nW[2]*t ]; };
   }
   const faces = [];
+  const silPts = [];                                       // icon block vertices -> the cream silhouette
   for (const C of n.contours){
     const F = C.map(gp => proj(to3D(gp,+1)));              // front cap (projected)
     const B = C.map(gp => proj(to3D(gp,-1)));              // back cap
+    if (ICON){ for (const q of F) silPts.push(q); for (const q of B) silPts.push(q); }
     faces.push({ v:F, front:true });
     faces.push({ v:B.slice().reverse(), front:false });
     for (let i=0;i<C.length;i++){ const j=(i+1)%C.length; faces.push({ v:[F[i],F[j],B[j],B[i]], front:false }); }  // side walls
@@ -1975,6 +1985,13 @@ function drawNoteObject(ctx, n){
       roundRectPath(ctx, 7,7,50,50,12); ctx.clip(); ctx.drawImage(im, 7, 7, 50, 50);
       ctx.restore();
     }
+  }
+  if (ICON && silPts.length >= 3){                                   // ONE cream silhouette outline (no internal edges)
+    const hull = convexHull(silPts);
+    ctx.beginPath(); ctx.moveTo(hull[0].sx, hull[0].sy);
+    for (let i=1;i<hull.length;i++) ctx.lineTo(hull[i].sx, hull[i].sy);
+    ctx.closePath();
+    ctx.lineWidth = 0.8; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgb(244,232,206)'; ctx.stroke();
   }
 }
 
