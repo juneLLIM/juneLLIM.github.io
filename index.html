@@ -19,14 +19,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:wght@300;400&family=JetBrains+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Pixelify+Sans:wght@400;600&family=VT323&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --paper: #EFE6D2;
-  --paper-soft: #E5D9BC;
-  --ink: #1A1610;
-  --ink-soft: #4A4234;
-  --ink-mute: #7A7058;
-  --amber: #C9952A;
-  --amber-soft: #E0B452;
-  --amber-deep: #8E661A;
+  --paper: #0C0A08;            /* deep warm dark — lets the wavefronts glow */
+  --paper-soft: #17130D;       /* card panel */
+  --ink: #ECE3CF;
+  --ink-soft: #C8BCA1;
+  --ink-mute: #8E8264;
+  --amber: #E6B95C;
+  --amber-soft: #F2CE83;
+  --amber-deep: #C9952A;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -41,22 +41,16 @@ html, body {
   font-family: 'Pixelify Sans', 'Newsreader', Georgia, serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
+  -webkit-user-select: none; user-select: none;   /* dragging to rotate shouldn't select text */
 }
+/* keep card content selectable */
+.card, .card * { -webkit-user-select: text; user-select: text; }
 
-body::before {
-  content: ''; position: fixed; inset: 0;
-  background-image:
-    radial-gradient(circle at 8% 17%, rgba(26,22,16,0.04) 0.6px, transparent 1px),
-    radial-gradient(circle at 73% 41%, rgba(26,22,16,0.03) 0.5px, transparent 1px),
-    radial-gradient(circle at 31% 79%, rgba(26,22,16,0.035) 0.7px, transparent 1px);
-  background-size: 7px 7px, 11px 11px, 13px 13px;
-  pointer-events: none; z-index: 500;
-  mix-blend-mode: multiply; opacity: 0.6;
-}
+/* darken the edges so the cat + waves stay the focus */
 body::after {
   content: ''; position: fixed; inset: 0;
-  background: radial-gradient(ellipse at center, transparent 60%, rgba(154, 122, 70, 0.16) 100%);
-  pointer-events: none; z-index: 499;
+  background: radial-gradient(ellipse at 50% 38%, transparent 42%, rgba(0,0,0,0.6) 100%);
+  pointer-events: none; z-index: 0;
 }
 
 /* =====  STAGE  ===== */
@@ -77,29 +71,6 @@ body::after {
   transform-origin: center center;
 }
 
-.cosmos {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 0; height: 0;
-}
-
-/* Orbital trajectory drawn as SVG so it lines up pixel-perfect with the note radius */
-.orbit-track {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  width: 360px; height: 360px;
-}
-.orbit-track circle {
-  fill: none;
-  stroke: var(--ink-mute);
-  stroke-width: 1;
-  stroke-dasharray: 3 6;
-}
-.orbit-track .ring-inner { stroke-opacity: 0.45; }
-.orbit-track .ring-outer { stroke-opacity: 0.16; stroke-dasharray: 1 7; }
-
 /* =====  CAT — true pixelated popcat + SVG legs  ===== */
 .cat-wrap {
   position: absolute;
@@ -116,9 +87,10 @@ body::after {
   transform: translate(-50%, -115px);
   font-family: 'Pixelify Sans', system-ui, sans-serif;
   font-style: normal; font-weight: 400;
-  font-size: 0.95rem;
-  color: var(--ink-soft);
-  letter-spacing: 0.05em;
+  font-size: 1.0rem;
+  color: rgb(244, 232, 206);   /* same warm tone as the music notes */
+  letter-spacing: 0.09em;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.7);
   white-space: nowrap;
   z-index: 6;
   pointer-events: none;
@@ -264,64 +236,6 @@ body::after {
 .contacts a.gh svg path { fill: currentColor; stroke: none; }
 .contacts a.li svg circle { fill: currentColor; }
 
-/* =====  ORBITING NOTES  ===== */
-.orbiter {
-  position: absolute;
-  top: 0; left: 0;
-  width: 0; height: 0;
-  animation: orbit 22s linear infinite;
-  animation-delay: var(--delay, 0s);
-  text-decoration: none;
-  color: var(--ink);
-}
-.orbiter.link { display: block; }
-@keyframes orbit { to { transform: rotate(360deg); } }
-
-.orbiter .arm { position: absolute; top: 0; left: 0; transform: translateX(var(--r, 240px)); }
-.orbiter .arm .glyph {
-  position: absolute; top: 0; left: 0;
-  width: 60px; height: 60px;
-  transform: translate(-50%, -50%);
-  color: var(--ink);
-  cursor: pointer;
-  animation: counterspin 22s linear infinite reverse, notePulse 1.6s ease-in-out infinite;
-  animation-delay: var(--delay, 0s);
-  transition: color 0.5s var(--ease-soft), filter 0.5s var(--ease-soft), transform-box 0.3s ease;
-}
-@keyframes counterspin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(-360deg); }
-}
-
-@keyframes notePulse {
-  0%, 100% { filter: none; }
-  50%      { filter: brightness(1.15) drop-shadow(0 0 6px rgba(201, 149, 42, 0.5)); }
-}
-
-.orbiter .arm .glyph svg { width: 100%; height: 100%; fill: currentColor; }
-.orbiter.link .arm .glyph svg { fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; }
-.orbiter.link[data-link="github"] .arm .glyph svg path { fill: currentColor; stroke: none; }
-.orbiter.link[data-link="linkedin"] .arm .glyph svg circle { fill: currentColor; }
-
-.orbiter:hover .glyph,
-.orbiter.active .glyph {
-  color: var(--amber);
-  filter: brightness(1.3) drop-shadow(0 0 12px rgba(201, 149, 42, 0.7));
-  animation: counterspin 22s linear infinite reverse, notePulse 1.6s ease-in-out infinite, hoverPulse 0.55s ease-in-out infinite;
-}
-.orbiter .arm .glyph {
-  transition: color 0.3s ease, filter 0.3s ease;
-}
-@keyframes hoverPulse {
-  0%, 100% { scale: 1; }
-  50%      { scale: 1.35; }
-}
-
-.world.frozen .orbiter,
-.world.frozen .orbiter .arm .glyph {
-  animation-play-state: paused;
-}
-
 /* =====  CARDS  ===== */
 .card {
   position: fixed;
@@ -332,7 +246,7 @@ body::after {
   background: var(--paper-soft);
   border: 1px solid var(--ink-mute);
   border-radius: 6px;
-  z-index: 30;
+  z-index: 120;            /* above the sound chip / contacts when open */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s var(--ease), transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -439,13 +353,6 @@ body::after {
 .proj-title .img-ico img { width: 22px; height: 22px; image-rendering: pixelated; image-rendering: crisp-edges; border-radius: 3px; }
 
 
-/* sound chip stays out of the way when a card is open */
-.world.frozen .sound-chip {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; }
 }
@@ -479,18 +386,66 @@ body::after {
   0%, 100% { transform: scale(1); opacity: 1; }
   50% { transform: scale(1.4); opacity: 0.6; }
 }
+
+/* =====  3D SOUND FIELD  ===== */
+#field, #scene, #fieldFront {
+  position: fixed;
+  inset: 0;
+  display: block;
+  pointer-events: none;   /* all pointer logic is handled on window */
+  touch-action: none;
+}
+/* The wave volume is split at the cat's depth: #field = back half (behind the cat),
+   #fieldFront = front half (in front of the cat), so the cat sits INSIDE the field.
+   Cards (z 30, inside the stage) stay above; the field dims while a card is open. */
+#field      { z-index: 1; transition: opacity 0.5s var(--ease-soft); }   /* back half */
+#scene      { z-index: 2; }                                              /* note sphere */
+#fieldFront { z-index: 11; transition: opacity 0.5s var(--ease-soft); }  /* front half (over the cat) */
+body.grabbing, body.grabbing * { cursor: grabbing !important; }
+.hints {
+  position: fixed; z-index: 60;
+  transform: translate(-50%, -100%);   /* anchored just above the name (left/top set in JS) */
+  display: flex; flex-direction: row; gap: 28px; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0; transition: opacity 0.4s var(--ease-soft);
+}
+.hints.show { opacity: 1; }
+.hint-item {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;   /* icon over text (two lines) */
+  color: var(--amber);
+  font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: 0.72rem;
+  letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.85);
+  opacity: 0.82; transition: opacity 0.6s var(--ease-soft), transform 0.6s var(--ease-soft);
+}
+.hint-item.gone { opacity: 0; transform: translateX(-16px); }   /* erased once its interaction is used */
+.hint-ico { width: 26px; height: 26px; flex: none; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7)); }
 </style>
 </head>
 <body>
 
+<!-- 3D sound field: wave propagation/interference behind, transparent note-sphere in front -->
+<canvas id="field" aria-hidden="true"></canvas>
+<canvas id="scene" aria-hidden="true"></canvas>
+<canvas id="fieldFront" aria-hidden="true"></canvas>
+<div class="hints" id="hints">
+  <div class="hint-item" id="hintRotate">
+    <svg class="hint-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+    <span>drag to rotate</span>
+  </div>
+  <div class="hint-item" id="hintHover">
+    <svg class="hint-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    <span>hover a note</span>
+  </div>
+  <div class="hint-item" id="hintTap">
+    <svg class="hint-ico" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.92-1.4z"/></svg>
+    <span>tap to ripple</span>
+  </div>
+</div>
+
 <main class="stage">
   <div class="world" id="world">
 
-    <!-- Orbit trajectory — same coord system as note arm radius -->
-    <svg class="orbit-track" viewBox="-180 -180 360 360">
-      <circle class="ring-inner" cx="0" cy="0" r="165"/>
-      <circle class="ring-outer" cx="0" cy="0" r="178"/>
-    </svg>
+    <!-- (orbit ring removed — notes now live on the 3D sphere drawn in #scene) -->
 
     <!-- Cat name label -->
     <div class="cat-name">June Lim</div>
@@ -1295,75 +1250,8 @@ body::after {
       <span class="dot"></span><span class="label">sound on</span>
     </button>
 
-    <!-- Orbiting music notes (5) -->
-    <div class="cosmos">
-
-      <!-- Education — quarter note (head perfectly at viewBox center) -->
-      <div class="orbiter" data-card="education" data-freq="73" style="--delay: 0s;">
-        <div class="arm" style="--r: 165px;">
-          <div class="glyph" style="--delay: 0s;">
-            <svg viewBox="0 0 64 64">
-              <ellipse cx="32" cy="32" rx="10" ry="7" transform="rotate(-18 32 32)"/>
-              <rect x="40" y="0" width="3" height="32"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Experience — half note (open head at center) -->
-      <div class="orbiter" data-card="experience" data-freq="98" style="--delay: -4.4s;">
-        <div class="arm" style="--r: 165px;">
-          <div class="glyph" style="--delay: -4.4s;">
-            <svg viewBox="0 0 64 64">
-              <ellipse cx="32" cy="32" rx="10" ry="7" transform="rotate(-18 32 32)" fill="none" stroke="currentColor" stroke-width="3.2"/>
-              <rect x="40" y="0" width="3" height="32"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Projects — eighth note (head at center, flag) -->
-      <div class="orbiter" data-card="projects" data-freq="61.74" style="--delay: -8.8s;">
-        <div class="arm" style="--r: 165px;">
-          <div class="glyph" style="--delay: -8.8s;">
-            <svg viewBox="0 0 64 64">
-              <ellipse cx="32" cy="32" rx="10" ry="7" transform="rotate(-18 32 32)"/>
-              <rect x="40" y="0" width="3" height="32"/>
-              <path d="M 42 0 C 58 4 62 14 58 22 C 58 14 50 10 42 10 Z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skills — sharp, symmetric around center -->
-      <div class="orbiter" data-card="skills" data-freq="82" style="--delay: -13.2s;">
-        <div class="arm" style="--r: 165px;">
-          <div class="glyph" style="--delay: -13.2s;">
-            <svg viewBox="0 0 64 64">
-              <rect x="22" y="10" width="3" height="44"/>
-              <rect x="40" y="10" width="3" height="44"/>
-              <rect x="14" y="24" width="36" height="4.5" transform="skewY(-8)"/>
-              <rect x="14" y="38" width="36" height="4.5" transform="skewY(-8)"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-      <!-- Music — bass clef (centered around y=32) -->
-      <div class="orbiter" data-card="music" data-freq="123" style="--delay: -17.6s;">
-        <div class="arm" style="--r: 165px;">
-          <div class="glyph" style="--delay: -17.6s;">
-            <svg viewBox="0 0 64 64">
-              <path d="M 18 16 C 32 12 44 20 44 32 C 44 44 34 50 22 50 C 18 50 14 46 14 42 C 14 38 18 34 22 34 C 26 34 30 38 30 42"
-                    stroke="currentColor" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="52" cy="20" r="3"/>
-              <circle cx="52" cy="30" r="3"/>
-            </svg>
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <!-- Music notes are rendered on the rotatable 3D sphere (#scene canvas).
+         Card/frequency/glyph data lives in the NOTES table in the script below. -->
 
 
     <!-- Cards: only AcouXSplat retains a link (the only project URL user provided) -->
@@ -1574,180 +1462,572 @@ document.addEventListener('mousemove', primeAudio, { once: true });
 document.addEventListener('touchstart', primeAudio, { once: true });
 document.addEventListener('touchend', primeAudio, { once: true });
 
-/* ===== HOVER ===== */
-const world = document.getElementById('world');
-const orbiters = document.querySelectorAll('.orbiter');
-const cards = document.querySelectorAll('.card');
+/* ============================================================
+   3D SOUND FIELD
+   - #field  (WebGL): wavefronts propagate from the cat (centre) and
+     from any active note "toggle", interfering on the sphere's disc.
+   - #scene  (Canvas 2D): a transparent sphere with the music notes
+     laid on its surface; drag (mouse) / touch to rotate in any
+     direction.  Notes still open cards and pluck bass notes.
+   ============================================================ */
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const cards   = document.querySelectorAll('.card');
+cards.forEach(c => document.body.appendChild(c));   // lift pages to the body root so their z-index sits ABOVE the hints/waves (no hiding needed)
+const catWrap = document.getElementById('catWrap');
+const catTilt = document.getElementById('catTilt');
+const catBodyWrap = document.getElementById('catBodyWrap');
+const fieldCanvas = document.getElementById('field');
+const fieldFront  = document.getElementById('fieldFront');
+const sceneCanvas = document.getElementById('scene');
+const sctx = sceneCanvas.getContext('2d');
 
-function byName(coll, name) { return Array.from(coll).find(x => x.dataset.card === name); }
+function byName(coll, name){ return Array.from(coll).find(x => x.dataset.card === name); }
 
-let activeName = null;
-let hideTimer = null;
+/* ---------- 3x3 matrix maths (row-major) ---------- */
+function matMul(a, b){
+  const r = new Array(9);
+  for (let i=0;i<3;i++) for (let j=0;j<3;j++)
+    r[i*3+j] = a[i*3]*b[j] + a[i*3+1]*b[3+j] + a[i*3+2]*b[6+j];
+  return r;
+}
+function matVec(m, v){
+  return [ m[0]*v[0]+m[1]*v[1]+m[2]*v[2],
+           m[3]*v[0]+m[4]*v[1]+m[5]*v[2],
+           m[6]*v[0]+m[7]*v[1]+m[8]*v[2] ];
+}
+function matVecT(m, v){   // transpose(m)*v — inverse rotation (m is orthonormal): world -> object space
+  return [ m[0]*v[0]+m[3]*v[1]+m[6]*v[2],
+           m[1]*v[0]+m[4]*v[1]+m[7]*v[2],
+           m[2]*v[0]+m[5]*v[1]+m[8]*v[2] ];
+}
+function axisAngle(x, y, z, a){
+  const c=Math.cos(a), s=Math.sin(a), t=1-c;
+  return [ t*x*x+c,   t*x*y-s*z, t*x*z+s*y,
+           t*x*y+s*z, t*y*y+c,   t*y*z-s*x,
+           t*x*z-s*y, t*y*z+s*x, t*z*z+c ];
+}
+let R = axisAngle(1,0,0,0.42);           // start looking slightly down onto the wave floor
+const inertia = { x:0, y:0 };
+const PAMP_INTERACT   = 0.9;   // user interactions (clicks, hovers, cat-tap, contacts, sound-on) -> biggest
+const PAMP_CAT        = 0.6;   // the cat's ambient pulse -> medium
+const PAMP_NOTE       = 0.55;  // the answering note -> close to the cat's so two-source nodes cancel to ~zero
+const SOUND_OFF_LEVEL = 0.35;  // when sound is OFF the whole field decays to this fraction
+let   soundLevel      = 1.0;   // smoothly lerps toward 1 (sound on) or SOUND_OFF_LEVEL (off)
+const CAMZ = 3.4;                        // camera distance (world units) -> perspective depth
 
-function positionCard(name) {
-  const orb = byName(orbiters, name);
-  const card = byName(cards, name);
-  if (!orb || !card) return;
-  const glyph = orb.querySelector('.glyph');
-  const gRect = glyph.getBoundingClientRect();
-  const worldRect = world.getBoundingClientRect();
-  const cx = worldRect.left + worldRect.width / 2;
-  const cy = worldRect.top + worldRect.height / 2;
-  const nx = gRect.left + gRect.width / 2;
-  const ny = gRect.top + gRect.height / 2;
-  let dx = nx - cx, dy = ny - cy;
-  const dist = Math.hypot(dx, dy) || 1;
-  const ux = dx / dist, uy = dy / dist;
-  const cardOffset = 160;
-  let tx = nx + ux * cardOffset;
-  let ty = ny + uy * cardOffset;
-  const cardW = card.offsetWidth || 300;
-  const cardH = card.offsetHeight || 200;
-  const pad = 24;
-  tx = Math.max(cardW/2 + pad, Math.min(window.innerWidth - cardW/2 - pad, tx));
-  ty = Math.max(cardH/2 + pad, Math.min(window.innerHeight - cardH/2 - pad, ty));
-  card.style.left = tx + 'px';
-  card.style.top = ty + 'px';
+/* ---------- the notes laid on the sphere ---------- */
+const NOTES = [
+  { card:'education',  freq:73.42,  glyph:'quarter', pos:[ 0.05,  0.66,  0.75] },
+  { card:'experience', freq:98.00,  glyph:'half',    pos:[ 0.82,  0.16,  0.55] },
+  { card:'projects',   freq:61.74,  glyph:'eighth',  pos:[ 0.58, -0.52, -0.63] },
+  { card:'skills',     freq:82.41,  glyph:'sharp',   pos:[-0.80,  0.08, -0.59] },
+  { card:'music',      freq:123.47, glyph:'bass',    pos:[-0.60, -0.58,  0.55] },
+];
+NOTES.forEach(n => {
+  const L = Math.hypot(n.pos[0],n.pos[1],n.pos[2]) || 1;
+  n.pos = n.pos.map(c => c/L);
+  n.sx = 0; n.sy = 0; n.depth = 0; n.exc = 0;
+});
+
+/* ---------- layout: centre everything on the cat ---------- */
+let cx=0, cy=0, scale=240, dpr=1;
+function layout(){
+  dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = window.innerWidth, h = window.innerHeight;
+  sceneCanvas.width  = Math.floor(w*dpr);
+  sceneCanvas.height = Math.floor(h*dpr);
+  sceneCanvas.style.width  = w+'px';
+  sceneCanvas.style.height = h+'px';
+  sctx.setTransform(dpr,0,0,dpr,0,0);
+  const r = catWrap.getBoundingClientRect();
+  cx = r.left + r.width/2;
+  cy = r.top  + r.height/2;
+  scale = Math.max(r.width*1.6, Math.min(w,h)*0.33);
+  scale = Math.min(scale, Math.min(w,h)*0.46);
+  const nameEl = document.querySelector('.cat-name'), hintsEl = document.getElementById('hints');
+  if (nameEl && hintsEl){ const nr = nameEl.getBoundingClientRect();    // sit the hints high above "June Lim" (clear of the wave shell)
+    hintsEl.style.left = (nr.left + nr.width/2) + 'px'; hintsEl.style.top = Math.max(24, nr.top - 98) + 'px'; }
+  projectNotes();          // valid note screen positions before the first frame renders
+  resizeField(w, h);
 }
 
-function show(name) {
-  clearTimeout(hideTimer);
-  if (activeName && activeName !== name) {
-    byName(cards, activeName)?.classList.remove('show');
-    byName(orbiters, activeName)?.classList.remove('active');
+/* perspective projection of every note -> screen px + depth + perspective scale */
+function projectNotes(){
+  for (const n of NOTES){
+    const x = R[0]*n.pos[0]+R[1]*n.pos[1]+R[2]*n.pos[2];
+    const y = R[3]*n.pos[0]+R[4]*n.pos[1]+R[5]*n.pos[2];
+    const z = R[6]*n.pos[0]+R[7]*n.pos[1]+R[8]*n.pos[2];
+    const persp = CAMZ/(CAMZ - z);          // nearer notes (z>0) project larger
+    n.sx = cx + scale*x*persp; n.sy = cy - scale*y*persp;
+    n.depth = z; n.persp = persp;
   }
-  world.classList.add('frozen');
-  byName(orbiters, name)?.classList.add('active');
+}
+
+/* =====================  VOLUMETRIC 3D WAVE FIELD (WebGL)  =====================
+   Each source emits travelling wave PACKETS — short bipolar pulses that start at the
+   source and expand outward as 3D spheres, fading with age + distance, so they naturally
+   vanish outward (a click launches one packet that travels away, not a static burst).
+   A per-pixel ray-march sums the packets and composites front-to-back, so you see the
+   3D spheres propagate and interfere (overlapping packets reinforce / cancel) with depth. */
+let fieldOK = false, fdpr = 0.5;
+const MAXP = 16;
+const CSPEED = 0.85;                       // packet expansion speed (world/s) — mirrors the shader
+const URMAX  = 1.3;                        // marched volume — just the note-sphere shell (field lives at r=1)
+const pings = [];                          // {pos:[x,y,z], t0, amp}
+const _ppos = new Float32Array(MAXP*3), _page = new Float32Array(MAXP), _pamp = new Float32Array(MAXP);
+const fieldLayers = [];                    // back half (behind cat) + front half (in front) -> cat sits inside the field
+
+const FIELD_FS = [
+  'precision highp float;',
+  'uniform vec2  uCenter;',          // cat centre, framebuffer px (bottom-up)
+  'uniform float uScale;',           // framebuffer px per world unit at z=0
+  'uniform float uCamz;',            // camera distance (world)
+  'uniform float uRmax;',            // wave-volume radius (world)
+  'uniform float uZmin;',            // this layer renders only z in [uZmin, uZmax]:
+  'uniform float uZmax;',            //   back half = z<0 (behind cat), front half = z>0 (in front)
+  'uniform int   uCount;',
+  'uniform float uGain;',            // global field intensity (1 = sound on, lower when sound is off)
+  'uniform vec3  uPos['+MAXP+'];',   // packet source positions (world)
+  'uniform float uAge['+MAXP+'];',   // packet ages (s)
+  'uniform float uAmp['+MAXP+'];',   // packet amplitudes
+  'const float CSPEED = 0.85;',      // wavefront expansion speed (world/s) — MUST mirror the JS CSPEED
+  'const float TH     = 0.075;',     // shell thickness -> ONE clean expanding pulse, no concentric ripples
+  'const float TAU    = 2.4;',       // temporal damping (s) -> the pulse swells then fades within its life
+  'const float FALL   = 0.60;',      // 1/(1+d*FALL) spherical spreading -> honest amplitude drop with distance
+  'const float RINGW  = 0.065;',     // width of the bright ring where the wave crosses the note-sphere surface
+  'const float RIM    = 1.55;',      // brightness of the 3D bubble SILHOUETTE (the expanding-sphere outline)
+  'const float FILL   = 0.14;',      // faint translucent interior -> each shell reads as a hollow 3D bubble
+  'const float SURF   = 2.5;',       // weight of the sphere-surface intersection -> it BLAZES
+  'const float XF     = 3.5;',       // strength of the INTERFERENCE hot spot (the constructive cross-term)
+  'const int   STEPS  = 44;',        // ray-march samples through the z-slab
+  'void main(){',
+  '  float ex = (gl_FragCoord.x - uCenter.x)/uScale;',
+  '  float ey = (gl_FragCoord.y - uCenter.y)/uScale;',
+  '  float R2 = uRmax*uRmax;',
+  '  float rr2 = ex*ex + ey*ey;',
+  '  float maxp = uCamz/(uCamz - uRmax);',
+  '  if (rr2 > R2*maxp*maxp){ gl_FragColor = vec4(0.0); return; }',  // ray misses the volume entirely
+  '  vec3  vd = normalize(vec3(ex, ey, -uCamz));',  // view-ray direction (constant along this ray -> bubble silhouette)
+  '  float dz = (uZmax - uZmin)/float(STEPS);',
+  '  float jitter = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);',  // dither -> breaks the z-march "LP grooves"
+  '  float T = 1.0, acc = 0.0, accX = 0.0;',
+  '  for (int st=0; st<STEPS; st++){',
+  '    float z = uZmax - (float(st)+jitter)*dz;',   // near -> far within this layer\'s z-slab
+  '    float persp = (uCamz - z)/uCamz;',        // perspective: rays converge at the camera
+  '    vec3  P = vec3(ex*persp, ey*persp, z);',
+  '    if (dot(P,P) > R2) continue;',
+  '    float W = 0.0, Wr = 0.0, Wsq = 0.0;',      // amplitude sum (W), silhouette (Wr), sum of squares (Wsq)
+  '    for (int i=0;i<'+MAXP+';i++){',
+  '      if (i >= uCount) break;',
+  '      vec3  rel = P - uPos[i]; float d = length(rel);',    // vector + distance from this source
+  '      float age = uAge[i];',
+  '      float x   = d - CSPEED*age;',            // signed distance from the expanding shell (x=0 = wavefront)
+  '      float amp = uAmp[i]*exp(-age/TAU)/(1.0 + FALL*d);',  // 1/r spreading + temporal damping
+  '      float env = exp(-(x*x)/(TH*TH));',                   // ONE Gaussian shell -> a single clean pulse (no ripples)
+  '      float rim = 1.0 - abs(dot(rel/max(d,0.001), vd));',  // grazing the view -> the bubble SILHOUETTE
+  '      rim = rim*rim;',
+  '      float w = amp*env;',
+  '      W  += w;',                                           // total amplitude (linear superposition)
+  '      Wsq += w*w;',                                        // sum of squares -> for the interference cross-term
+  '      Wr += w*rim;',                                       // silhouette-weighted -> the 3D bubble outline
+  '    }',
+  '    float rad   = length(P);',
+  '    float surf  = exp(-((rad-1.0)/RINGW)*((rad-1.0)/RINGW));',  // proximity to the note-sphere surface (r=1)
+  '    float interior = 1.0 - smoothstep(0.98, 1.26, rad);',       // confine the volume to the sphere (+ a touch past)
+  '    float innerFade= smoothstep(0.06, 0.42, rad);',             // CAT CLEARANCE: keep the pixel-art face clear
+  '    float depth = 0.5 + 0.5*(P.z/max(rad, 0.001));',            // 1 = facing the camera, 0 = far side -> 3D shading
+  '    float bubble= Wr * (0.55 + 0.45*depth);',                   // the expanding 3D bubble outline (near side brighter)
+  '    float blaze = (0.74*Wr + 0.26*W) * surf * (0.30 + 0.70*depth);', // boundary crossing -> a BRIGHT ring, not a fill
+  '    float fill  = W * FILL;',                                   // faint translucent interior
+  '    float sig   = (RIM*bubble + fill) + SURF*blaze;',
+  '    float wc    = sig/(1.0 + 0.42*sig);',                       // soft-knee so blazes bloom without clipping
+  '    float dens  = wc * interior * innerFade;',
+  '    float xi    = max(W*W - Wsq, 0.0);',                        // INTERFERENCE energy = |sum A|^2 - sum|A|^2 (0 for a lone wave)
+  '    float sigX  = XF * xi * (0.4 + 0.6*depth);',                // the constructive cross-term -> a physical hot spot
+  '    float wcX   = sigX/(1.0 + 0.5*sigX);',
+  '    float densX = wcX * interior * innerFade;',
+  '    acc  += T*dens*0.6;',
+  '    accX += T*densX*0.6;',                                      // interference accumulates on its own (hot) channel
+  '    T    *= (1.0 - (dens + densX)*0.45);',
+  '    if (T < 0.02) break;',
+  '  }',
+  '  float bright = clamp(acc*0.52, 0.0, 1.0) * uGain;',    // amber wave brightness (scaled by sound state)
+  '  float xlev   = clamp(accX*0.9, 0.0, 1.0) * uGain;',    // interference energy 0..1
+  '  vec3  hotC   = mix(vec3(1.0,0.80,0.42), vec3(1.0,0.97,0.90), smoothstep(0.2, 0.95, xlev));',  // blackbody-ish: gold -> white as energy rises
+  '  vec3  col    = vec3(0.902,0.725,0.361)*bright + hotC*xlev;', // amber wavefronts + a physical hot spot where they reinforce
+  '  float a      = clamp(acc*0.30 + xlev*0.5, 0.0, 1.0) * uGain;',
+  '  gl_FragColor = vec4(col, a);',                  // premultiplied
+  '}'
+].join('\n');
+
+function buildFieldLayer(canvas, zmin, zmax){
+  const gl = canvas.getContext('webgl', {alpha:true, premultipliedAlpha:true, antialias:false})
+          || canvas.getContext('experimental-webgl', {alpha:true, premultipliedAlpha:true});
+  if (!gl) return null;
+  const vs = 'attribute vec2 p; void main(){ gl_Position = vec4(p,0.0,1.0); }';
+  const sh = (type, src) => { const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, vs));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FIELD_FS));
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
+  gl.useProgram(prog);
+  const buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const uni = {};
+  ['uCenter','uScale','uCamz','uRmax','uZmin','uZmax','uCount','uGain'].forEach(k => uni[k]=gl.getUniformLocation(prog,k));
+  uni.uPos=gl.getUniformLocation(prog,'uPos[0]'); uni.uAge=gl.getUniformLocation(prog,'uAge[0]'); uni.uAmp=gl.getUniformLocation(prog,'uAmp[0]');
+  gl.enable(gl.BLEND); gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA); gl.clearColor(0,0,0,0);
+  return { gl, prog, uni, canvas, zmin, zmax };
+}
+function initField(){
+  if (reduceMotion){ fieldCanvas.style.display='none'; if (fieldFront) fieldFront.style.display='none'; return; }
+  try{
+    const back  = buildFieldLayer(fieldCanvas, -URMAX, 0.0);   // z<0 -> behind the cat
+    const front = buildFieldLayer(fieldFront,    0.0, URMAX);  // z>0 -> in front of the cat
+    if (!back || !front) throw new Error('no webgl');
+    fieldLayers.push(back, front);
+    fieldOK = true;
+  } catch(e){
+    console.warn('Wave field (WebGL) unavailable:', e && e.message);
+    fieldCanvas.style.display='none'; if (fieldFront) fieldFront.style.display='none'; fieldOK=false;
+  }
+}
+function resizeField(w, h){
+  if (!fieldOK) return;
+  fdpr = Math.min(window.devicePixelRatio || 1, 1.3);   // near-native: crisp bubble rims (the sphere is small, so cost stays bounded — empty pixels early-discard)
+  for (const L of fieldLayers){
+    L.canvas.width = Math.max(1, Math.floor(w*fdpr)); L.canvas.height = Math.max(1, Math.floor(h*fdpr));
+    L.canvas.style.width = w+'px'; L.canvas.style.height = h+'px';
+    L.gl.viewport(0, 0, L.canvas.width, L.canvas.height);
+  }
+}
+function dimField(v){ for (const L of fieldLayers) L.canvas.style.opacity = v; }
+function pushPing(objPos, amp){
+  pings.push({ pos:[objPos[0],objPos[1],objPos[2]], t0:performance.now(), amp:amp });
+  if (pings.length > MAXP) pings.shift();
+}
+function drawField(now){
+  if (!fieldOK) return;
+  soundLevel += ((audioOn ? 1.0 : SOUND_OFF_LEVEL) - soundLevel) * 0.06;   // sound off -> whole field decays uniformly
+  while (pings.length && (now - pings[0].t0)/1000 > 2.6) pings.shift();   // packet has swept across the sphere shell
+  const cnt = Math.min(pings.length, MAXP);
+  for (let i=0;i<cnt;i++){
+    const pg = pings[i]; const w = matVec(R, pg.pos);   // every source rotates with the sphere
+    _ppos[i*3]=w[0]; _ppos[i*3+1]=w[1]; _ppos[i*3+2]=w[2];
+    _page[i]=(now-pg.t0)/1000; _pamp[i]=pg.amp;
+  }
+  for (const L of fieldLayers){
+    const gl = L.gl, uni = L.uni;
+    gl.useProgram(L.prog);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    if (cnt === 0) continue;
+    gl.uniform2f(uni.uCenter, cx*fdpr, L.canvas.height - cy*fdpr);
+    gl.uniform1f(uni.uScale, scale*fdpr);
+    gl.uniform1f(uni.uCamz, CAMZ);
+    gl.uniform1f(uni.uRmax, URMAX);
+    gl.uniform1f(uni.uZmin, L.zmin);
+    gl.uniform1f(uni.uZmax, L.zmax);
+    gl.uniform1i(uni.uCount, cnt);
+    gl.uniform1f(uni.uGain, soundLevel);
+    gl.uniform3fv(uni.uPos, _ppos.subarray(0, cnt*3));
+    gl.uniform1fv(uni.uAge, _page.subarray(0, cnt));
+    gl.uniform1fv(uni.uAmp, _pamp.subarray(0, cnt));
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  }
+}
+
+/* =====================  SPHERE + NOTES (Canvas 2D)  ===================== */
+/* The sphere has no wireframe now — it is defined by the music notes laid on it
+   (drag to rotate) plus the glowing 3D wave volume. This just clears the canvas. */
+function drawSphere(){
+  sctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+}
+function drawGlyph(type, x, y, S, color){
+  const k = S/64;
+  sctx.save();
+  sctx.translate(x, y); sctx.scale(k, k); sctx.translate(-32, -32);
+  sctx.fillStyle = color; sctx.strokeStyle = color; sctx.lineCap='round'; sctx.lineJoin='round';
+  if (type==='quarter' || type==='eighth'){
+    sctx.save(); sctx.translate(32,32); sctx.rotate(-18*Math.PI/180);
+    sctx.beginPath(); sctx.ellipse(0,0,10,7,0,0,Math.PI*2); sctx.fill(); sctx.restore();
+    sctx.fillRect(40,0,3,32);
+    if (type==='eighth') sctx.fill(new Path2D('M 42 0 C 58 4 62 14 58 22 C 58 14 50 10 42 10 Z'));
+  } else if (type==='half'){
+    sctx.save(); sctx.translate(32,32); sctx.rotate(-18*Math.PI/180);
+    sctx.lineWidth=3.2; sctx.beginPath(); sctx.ellipse(0,0,10,7,0,0,Math.PI*2); sctx.stroke(); sctx.restore();
+    sctx.fillRect(40,0,3,32);
+  } else if (type==='sharp'){
+    sctx.fillRect(22,10,3,44); sctx.fillRect(40,10,3,44);
+    sctx.save(); sctx.transform(1,-0.14,0,1,0,0); sctx.fillRect(14,24,36,4.5); sctx.fillRect(14,38,36,4.5); sctx.restore();
+  } else if (type==='bass'){
+    sctx.lineWidth=5;
+    sctx.stroke(new Path2D('M 18 16 C 32 12 44 20 44 32 C 44 44 34 50 22 50 C 18 50 14 46 14 42 C 14 38 18 34 22 34 C 26 34 30 38 30 42'));
+    sctx.beginPath(); sctx.arc(52,20,3,0,Math.PI*2); sctx.fill();
+    sctx.beginPath(); sctx.arc(52,30,3,0,Math.PI*2); sctx.fill();
+  }
+  sctx.restore();
+}
+function drawNotes(){
+  projectNotes();
+  const arr = NOTES.slice().sort((a,b) => a.depth - b.depth);
+  for (const n of arr){
+    const front = n.depth*0.5 + 0.5;
+    let S = scale*0.135*n.persp;          // perspective size: nearer notes bigger
+    let alpha = 0.3 + 0.7*front;
+    const lit = (hoverNote===n || activeName===n.card);
+    sctx.save();
+    if (lit){
+      S *= 1.22;
+      sctx.shadowColor = 'rgba(242,206,131,0.95)'; sctx.shadowBlur = 24;
+      drawGlyph(n.glyph, n.sx, n.sy, S, 'rgba(248,226,168,' + Math.max(alpha,0.97).toFixed(3) + ')');  // amber glow
+      sctx.shadowBlur = 0;
+      drawGlyph(n.glyph, n.sx, n.sy, S, 'rgba(255,245,218,' + Math.max(alpha,0.97).toFixed(3) + ')');  // crisp bright core
+    } else {
+      sctx.shadowColor = 'rgba(230,185,92,0.55)'; sctx.shadowBlur = 14;
+      drawGlyph(n.glyph, n.sx, n.sy, S, 'rgba(235,206,150,' + (alpha*0.9).toFixed(3) + ')');           // soft amber glow
+      sctx.shadowBlur = 0;
+      drawGlyph(n.glyph, n.sx, n.sy, S, 'rgba(244,232,206,' + alpha.toFixed(3) + ')');                 // crisp warm core
+    }
+    sctx.restore();
+  }
+}
+
+/* =====================  CARDS  ===================== */
+let activeName = null, hideTimer = null;
+function positionCard(name){
+  const n = NOTES.find(x => x.card===name), card = byName(cards, name);
+  if (!n || !card) return;
+  let dx=n.sx-cx, dy=n.sy-cy; const d=Math.hypot(dx,dy)||1;
+  let tx=n.sx + dx/d*150, ty=n.sy + dy/d*150;
+  const cw=card.offsetWidth||300, ch=card.offsetHeight||200, pad=20;
+  tx = Math.max(cw/2+pad, Math.min(window.innerWidth  - cw/2-pad, tx));
+  ty = Math.max(ch/2+pad, Math.min(window.innerHeight - ch/2-pad, ty));
+  card.style.left = tx+'px'; card.style.top = ty+'px';
+}
+function show(name){
+  clearTimeout(hideTimer);
+  if (activeName && activeName!==name) byName(cards, activeName)?.classList.remove('show');
   positionCard(name);
   byName(cards, name)?.classList.add('show');
   activeName = name;
+  eraseHint('hintHover');                  // a note was opened -> drop the "hover a note" hint
+  kick();                                  // pages render above hints/waves via z-order (lifted to body root)
 }
-
-function hide() {
-  hideTimer = setTimeout(() => {
-    world.classList.remove('frozen');
-    cards.forEach(c => c.classList.remove('show'));
-    orbiters.forEach(o => o.classList.remove('active'));
-    activeName = null;
-  }, 90);
+function closeCards(){
+  cards.forEach(c => c.classList.remove('show'));
+  activeName = null;
+  kick();
 }
-
-orbiters.forEach(orb => {
-  const glyph = orb.querySelector('.glyph');
-  const name = orb.dataset.card;
-  const link = orb.dataset.link;
-  const freq = orb.dataset.freq;
-  // Link orbiters: no card, just pluck on hover, navigate on click
-  if (link) {
-    glyph.addEventListener('mouseenter', () => { pluckBass(parseFloat(freq), 0.6); spawnBurst(glyph); });
-    return;
-  }
-  glyph.addEventListener('mouseenter', () => {
-    show(name);
-    pluckBass(parseFloat(freq), 0.6);
-    spawnBurst(glyph);
-  });
-  glyph.addEventListener('mouseleave', hide);
-  glyph.addEventListener('click', e => {
-    show(name);
-    pluckBass(parseFloat(freq));
-    spawnBurst(glyph);
-  });
-});
-
-/* Burst ripple at element center */
-function spawnBurst(elem) {
-  const r = elem.getBoundingClientRect();
-  const b = document.createElement('div');
-  b.className = 'burst';
-  b.style.left = (r.left + r.width/2) + 'px';
-  b.style.top  = (r.top + r.height/2) + 'px';
-  document.body.appendChild(b);
-  setTimeout(() => b.remove(), 700);
-}
-
-/* Ripple from the cat when a bass note plays */
-function catRipple() {
-  if (!catWrap) return;
-  const r = document.createElement('div');
-  r.className = 'cat-ripple';
-  catWrap.appendChild(r);
-  setTimeout(() => r.remove(), 1100);
-}
-
+function hide(){ hideTimer = setTimeout(closeCards, 110); }
 cards.forEach(card => {
   card.addEventListener('mouseenter', () => clearTimeout(hideTimer));
   card.addEventListener('mouseleave', hide);
 });
-
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && activeName) {
-    clearTimeout(hideTimer);
-    world.classList.remove('frozen');
-    cards.forEach(c => c.classList.remove('show'));
-    orbiters.forEach(o => o.classList.remove('active'));
-    activeName = null;
-  }
+  if (e.key==='Escape' && activeName){ clearTimeout(hideTimer); closeCards(); }
 });
 
-const catWrap = document.getElementById('catWrap');
-const catTilt = document.getElementById('catTilt');
-const catBodyWrap = document.getElementById('catBodyWrap');
+/* =====================  AUDIO HOOKS  ===================== */
 const catNotes = [41.20, 55.00, 73.42, 98.00, 82.41, 61.74];
 let catIdx = 0;
-catWrap.addEventListener('click', () => {
-  pluckBass(catNotes[catIdx % catNotes.length]);
-  catIdx++;
-  // Jump animation
+function activateNote(n){
+  show(n.card);
+  pluckBass(n.freq);
+  pushPing(n.pos, PAMP_INTERACT);  // note tap (interaction) -> biggest; interferes with the cat's
+}
+function catPlay(){
+  const f = catNotes[catIdx++ % catNotes.length];
+  pluckBass(f);
+  pushPing([0,0,0], PAMP_INTERACT);         // cat tap (interaction) -> biggest; concentric -> whole surface
   catBodyWrap.classList.remove('jumped');
   void catBodyWrap.offsetWidth;
   catBodyWrap.classList.add('jumped');
   setTimeout(() => catBodyWrap.classList.remove('jumped'), 600);
-  catRipple();
-});
+}
 
-/* Mouse-following cat tilt + flip on left */
+/* =====================  INPUT: drag to rotate, tap to open  ===================== */
+const ptr = { down:false, drag:false, id:null, sx:0, sy:0, lx:0, ly:0, vx:0, vy:0, type:'mouse' };
+let suppressTap=false, hoverNote=null, mouseX=-1, mouseY=-1, overUI=false;
+
+function isUI(t){ return !!(t && t.closest && t.closest('.card, .contacts, .sound-chip')); }
+function rotateBy(dx, dy){
+  const ry = axisAngle(0,1,0, dx*0.008);   // about screen vertical
+  const rx = axisAngle(1,0,0, dy*0.008);   // about screen horizontal
+  R = matMul(matMul(ry, rx), R);
+}
+function noteAt(x, y){
+  let best=null;
+  const hitR = Math.max(30, scale*0.18);
+  for (const n of NOTES){
+    if (Math.hypot(n.sx-x, n.sy-y) < hitR && (!best || n.depth>best.depth)) best=n;
+  }
+  return best;
+}
+function handleTap(x, y){
+  if (suppressTap) return;
+  const n = noteAt(x, y);
+  if (n){ activateNote(n); return; }
+  const r = catWrap.getBoundingClientRect();
+  if (x>=r.left && x<=r.right && y>=r.top && y<=r.bottom){ catPlay(); eraseHint('hintTap'); return; }
+  // click in empty space: launch a wave packet from that point, stored in the sphere's
+  // object space so it rotates with everything else; it interferes with the cat & notes
+  pushPing(matVecT(R, [(x-cx)/scale, (cy-y)/scale, 0]), PAMP_INTERACT);   // click (interaction) -> biggest
+  pluckBass(55, 0.6);
+  eraseHint('hintTap');                     // a tap/ripple was made -> drop the "tap to ripple" hint
+  if (activeName){ clearTimeout(hideTimer); closeCards(); }
+}
+
+window.addEventListener('pointerdown', e => {
+  if (isUI(e.target)) return;
+  ptr.down=true; ptr.drag=false; ptr.id=e.pointerId; ptr.type=e.pointerType;
+  ptr.sx=ptr.lx=e.clientX; ptr.sy=ptr.ly=e.clientY; ptr.vx=ptr.vy=0;
+  try { if (e.target.setPointerCapture) e.target.setPointerCapture(e.pointerId); } catch(_){}
+  kick();
+});
+window.addEventListener('pointermove', e => {
+  mouseX=e.clientX; mouseY=e.clientY; overUI=isUI(e.target);
+  if (!ptr.down) ptr.type=e.pointerType;
+  // recover if a mouse button was released off-window (no pointerup delivered)
+  if (ptr.down && e.pointerType==='mouse' && e.buttons===0){ endPointer(e); return; }
+  kick();
+  if (ptr.down && e.pointerId===ptr.id){
+    const dx=e.clientX-ptr.lx, dy=e.clientY-ptr.ly;
+    if (!ptr.drag && Math.hypot(e.clientX-ptr.sx, e.clientY-ptr.sy) > 6){
+      ptr.drag=true; document.body.classList.add('grabbing'); eraseHint('hintRotate');
+    }
+    if (ptr.drag){
+      e.preventDefault();
+      rotateBy(dx, dy);
+      ptr.vx=dx; ptr.vy=dy; ptr.lx=e.clientX; ptr.ly=e.clientY;
+    }
+  }
+}, { passive:false });
+function endPointer(e){
+  if (!ptr.down || e.pointerId!==ptr.id) return;
+  if (ptr.drag){ inertia.x=ptr.vx; inertia.y=ptr.vy; suppressTap=true; setTimeout(()=>suppressTap=false, 60); }
+  else { handleTap(e.clientX, e.clientY); }
+  ptr.down=false; ptr.drag=false;
+  document.body.classList.remove('grabbing');
+  kick();
+}
+window.addEventListener('pointerup', endPointer);
+window.addEventListener('pointercancel', e => { ptr.down=false; ptr.drag=false; document.body.classList.remove('grabbing'); });
+window.addEventListener('blur', () => { ptr.down=false; ptr.drag=false; document.body.classList.remove('grabbing'); });
+
+/* hover (mouse only) — catch a note as it passes under the cursor */
+function updateHover(){
+  if (ptr.drag || overUI || ptr.type==='touch' || mouseX<0){ return; }
+  let best=null;
+  const hitR = Math.max(28, scale*0.17);
+  for (const n of NOTES){
+    if (Math.hypot(n.sx-mouseX, n.sy-mouseY) < hitR && n.depth>-0.15 && (!best || n.depth>best.depth)) best=n;
+  }
+  if (best !== hoverNote){
+    if (best){
+      hoverNote = best;
+      eraseHint('hintHover');               // a note was hovered -> drop the "hover a note" hint
+      // don't re-pluck/re-show a note whose card is already open (e.g. it wobbled in/out under the cursor)
+      if (best.card !== activeName){ pluckBass(best.freq, 0.55); pushPing(best.pos, PAMP_INTERACT); show(best.card); }
+    } else { hoverNote = null; hide(); }
+  }
+}
+
+/* keep the original mouse-following cat tilt + flip */
 document.addEventListener('mousemove', e => {
   if (!catTilt) return;
   const r = catWrap.getBoundingClientRect();
-  const cx = r.left + r.width / 2;
-  const dx = (e.clientX - cx) / window.innerWidth;
-  const rot = dx * 14;  // ±7 deg
-  catTilt.style.setProperty('--mouse-rot', rot + 'deg');
-  // Flip the cat to face the cursor (left half → mirror)
-  catTilt.style.setProperty('--mouse-flip', e.clientX < window.innerWidth / 2 ? -1 : 1);
+  const cxx = r.left + r.width/2;
+  catTilt.style.setProperty('--mouse-rot', ((e.clientX-cxx)/window.innerWidth*14) + 'deg');
+  catTilt.style.setProperty('--mouse-flip', e.clientX < window.innerWidth/2 ? -1 : 1);
 });
 
+/* =====================  RENDER LOOP  ===================== */
+let lastT = performance.now(), catAcc = 0, noteAcc = 0, pendNote = null, fcount = 0, running = false;
+function kick(){ if (!running){ running = true; lastT = performance.now(); requestAnimationFrame(frame); } }
+/* re-orthonormalise R (Gram-Schmidt) so accumulated float error never skews the sphere */
+function orthonormalize(m){
+  let ax=m[0],ay=m[1],az=m[2], bx=m[3],by=m[4],bz=m[5];
+  let l=Math.hypot(ax,ay,az)||1; ax/=l; ay/=l; az/=l;
+  const d=bx*ax+by*ay+bz*az; bx-=d*ax; by-=d*ay; bz-=d*az;
+  l=Math.hypot(bx,by,bz)||1; bx/=l; by/=l; bz/=l;
+  return [ax,ay,az, bx,by,bz, ay*bz-az*by, az*bx-ax*bz, ax*by-ay*bx];  // row2 = row0 × row1
+}
+function frame(now){
+  const dt = Math.min(0.05, (now-lastT)/1000); lastT = now;
+  if (!ptr.down){
+    if (Math.abs(inertia.x)+Math.abs(inertia.y) > 0.08){
+      rotateBy(inertia.x, inertia.y); inertia.x*=0.93; inertia.y*=0.93;
+    } else if (!reduceMotion && !activeName){
+      R = matMul(R, axisAngle(0,1,0, 0.16*dt));   // revolve about the vertical -> wave floor stays put, notes carousel
+    }
+  }
+  if ((++fcount % 600) === 0) R = orthonormalize(R);
+  if (audioOn && !reduceMotion){       // CALL-AND-RESPONSE: the cat pulses, a note answers ~0.55s later, so their
+    catAcc += dt;                      // two wavefronts reliably cross -> the intersection blazes (clear interference)
+    if (catAcc > 3.0){ catAcc -= 3.0;
+      pushPing([0,0,0], PAMP_CAT);                                   // the cat's shell, from the centre
+      let best = NOTES[0]; for (const n of NOTES) if (n.depth > best.depth) best = n;  // the note facing us
+      pendNote = best; noteAcc = 0.55;                             // a note answers a beat later -> their shells cross
+    }
+    if (pendNote){ noteAcc -= dt; if (noteAcc <= 0.0){ pushPing(pendNote.pos, PAMP_NOTE); pendNote = null; } }
+  }
+  drawField(now);          // the interference field, on #field behind everything
+  drawSphere();            // clears the #scene canvas
+  drawNotes();
+  updateHover();
+  if (activeName) positionCard(activeName);
+  // keep animating while there is motion; otherwise idle (reduced-motion users) and resume on interaction
+  const busy = !reduceMotion || ptr.down || !!activeName
+            || (Math.abs(inertia.x)+Math.abs(inertia.y) > 0.08);
+  if (busy) requestAnimationFrame(frame); else running = false;
+}
 
-window.addEventListener('resize', () => { if (activeName) positionCard(activeName); });
-
-/* sound toggle */
+/* =====================  SOUND TOGGLE  ===================== */
 const soundToggle = document.getElementById('soundToggle');
-if (soundToggle) {
+if (soundToggle){
   soundToggle.addEventListener('click', () => {
+    clearTimeout(hideTimer);
+    if (activeName) closeCards();          // also restores the field opacity if a card was open
     audioOn = !audioOn;
     soundToggle.classList.toggle('on', audioOn);
     soundToggle.querySelector('.label').textContent = audioOn ? 'sound on' : 'sound off';
-    if (audioOn) {
+    if (audioOn){
       catWrap.classList.remove('crying');
       unlockAudio();
-      [41.20, 55.00, 73.42, 98.00].forEach((f, i) => setTimeout(() => pluckBass(f), i * 180));
+      [41.20, 55.00, 73.42, 98.00].forEach((f, i) => setTimeout(() => {
+        pluckBass(f); pushPing([0,0,0], PAMP_INTERACT); kick();
+      }, i*170));
     } else {
       catWrap.classList.add('crying');
     }
+    kick();
   });
 }
 
-/* sound also on contact-icon hover */
-const contactFreqs = { 'mailto': 55, 'github': 73.42, 'linkedin': 98 };
+/* contact-icon hover still plucks + ripples from the centre */
 document.querySelectorAll('.contacts a').forEach(a => {
-  let freq = 55;
   const href = a.getAttribute('href') || '';
-  if (href.startsWith('mailto:')) freq = 55;
-  else if (href.includes('github')) freq = 73.42;
+  let freq = 55;
+  if (href.includes('github')) freq = 73.42;
   else if (href.includes('linkedin')) freq = 98;
-  a.addEventListener('mouseenter', () => pluckBass(freq, 0.6));
+  a.addEventListener('mouseenter', () => { pluckBass(freq, 0.6); pushPing([0,0,0], PAMP_INTERACT); kick(); });
 });
+
+/* =====================  HINTS (shown once on load; each erases independently on its first use)  ===================== */
+let hintsLive = false;
+function eraseHint(id){ if (!hintsLive) return; const h = document.getElementById(id); if (h) h.classList.add('gone'); }
+setTimeout(() => { const h = document.getElementById('hints'); if (h) h.classList.add('show'); hintsLive = true; }, 200);  // reveal quickly, THEN allow erasing
+
+/* =====================  BOOT  ===================== */
+initField();
+layout();
+/* the interference field shows continuously while sound is on (see drawField) */
+window.addEventListener('resize', () => { layout(); if (activeName) positionCard(activeName); kick(); });
+window.addEventListener('load', () => { layout(); kick(); });
+requestAnimationFrame(() => { layout(); kick(); });
 </script>
 </body>
 </html>
