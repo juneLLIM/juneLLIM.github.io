@@ -1664,7 +1664,7 @@ const FIELD_FS = [
   'const float RINGW  = 0.06;',      // width of the boundary flare ring at r=1
   'const float SURF   = 3.5;',       // boundary flare strength (NOTES flare at r=1; the cat does NOT)
   'const float XF     = 3.0;',       // strength of the INTERFERENCE hot spot (the constructive cross-term)
-  'const int   STEPS  = 54;',        // ray-march samples through the z-slab
+  'const int   STEPS  = 42;',        // ray-march samples through the z-slab
   'void main(){',
   '  float ex = (gl_FragCoord.x - uCenter.x)/uScale;',
   '  float ey = (gl_FragCoord.y - uCenter.y)/uScale;',
@@ -1767,7 +1767,7 @@ function initField(){
 }
 function resizeField(w, h){
   if (!fieldOK) return;
-  fdpr = Math.min(window.devicePixelRatio || 1, 1.3);   // near-native: crisp bubble rims (the sphere is small, so cost stays bounded — empty pixels early-discard)
+  fdpr = Math.min(window.devicePixelRatio || 1, 0.85);  // below-native: the field is a soft glow, so this halves the pixel work
   for (const L of fieldLayers){
     L.canvas.width = Math.max(1, Math.floor(w*fdpr)); L.canvas.height = Math.max(1, Math.floor(h*fdpr));
     L.canvas.style.width = w+'px'; L.canvas.style.height = h+'px';
@@ -1775,7 +1775,7 @@ function resizeField(w, h){
   }
 }
 function dimField(v){ for (const L of fieldLayers) L.canvas.style.opacity = v; }
-const PAMP_JITTER = 0.7;   // each pulse's magnitude is randomised by ± this fraction -> livelier, less uniform field
+const PAMP_JITTER = 0.9;   // each pulse's magnitude is randomised by ± this fraction -> livelier, less uniform field
 function pushPing(objPos, amp){
   // cat (centre) pulses do NOT flare at the note-sphere boundary -> encode that as a negative amplitude
   const isCat = objPos[0]===0 && objPos[1]===0 && objPos[2]===0;
@@ -2095,7 +2095,7 @@ document.addEventListener('mousemove', e => {
 });
 
 /* =====================  RENDER LOOP  ===================== */
-let lastT = performance.now(), catAcc = 0, noteAcc = 0, catBeat = 0, catTick = 0, fcount = 0, running = false;
+let lastT = performance.now(), catAcc = 0, noteAcc = 0, catBeat = 0, catTick = 0, fcount = 0, running = false, noteMul = 1;
 let catHover = false;     // cat-pulse interval follows the catBob animation: hover 0.3s, sound-on 0.6s, sound-off 1.6s
 catWrap.addEventListener('mouseenter', () => { catHover = true; });
 catWrap.addEventListener('mouseleave', () => { catHover = false; });
@@ -2122,8 +2122,10 @@ function frame(now){
     const period = audioOn ? (catHover ? 0.5 : 0.85) : (catHover ? 1.2 : 1.6);   // mirrors the catBob durations in every state
     catAcc += dt;
     if (catAcc > period){ catAcc -= period; pushPing([0,0,0], PAMP_CAT); }
-    noteAcc += dt;                      // notes: only occasionally, cycling through different notes -> a gentle interference
-    if (noteAcc > 5.0){ noteAcc -= 5.0; pushPing(NOTES[catBeat % NOTES.length].pos, PAMP_NOTE); catBeat++; }
+    noteAcc += dt;                      // notes fire at TWICE the cat cadence, cycling through the notes (with a random spread)
+    const noteEvery = period * 2 * noteMul;
+    if (noteAcc > noteEvery){ noteAcc -= noteEvery; pushPing(NOTES[catBeat % NOTES.length].pos, PAMP_NOTE); catBeat++;
+      noteMul = 1 + (Math.random()*2 - 1) * 0.4; }   // ±40% random spread on the next note interval
   }
   drawField(now);          // the interference field, on #field behind everything
   drawSphere();            // clears the #scene canvas
