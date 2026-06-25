@@ -401,15 +401,15 @@ body::after {
 .spatial-tag .hp-ico { width: 15px; height: 15px; flex: none; opacity: 0.9; }
 .sound-chip .chip-top { font-size: 0.72em; opacity: 0.62; letter-spacing: 0.2em; }   /* small "spatial" on top */
 .sound-chip .chip-state { display: inline-flex; align-items: center; }
-.sound-chip .dot {
-  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
-  background: currentColor; margin-right: 0.45rem;
+.sound-chip .chip-spk {
+  width: 14px; height: 14px; flex: none;
+  margin-right: 0.4rem; fill: currentColor;
   opacity: 0.4;
 }
-.sound-chip.on .dot { opacity: 1; animation: pulseDot 1.2s ease-in-out infinite; }
-@keyframes pulseDot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.4); opacity: 0.6; }
+.sound-chip.on .chip-spk { opacity: 1; animation: spkBlink 1.1s ease-in-out infinite; }   /* blinks while sound is on */
+@keyframes spkBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
 }
 
 /* =====  3D SOUND FIELD  ===== */
@@ -445,6 +445,11 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
 }
 .hint-item.gone { opacity: 0; transform: translateX(-16px); }   /* erased once its interaction is used */
 .hint-ico { width: 26px; height: 26px; flex: none; filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7)); }
+@media (max-width: 480px){
+  .hints { gap: 16px; }
+  .hint-item { font-size: 0.62rem; letter-spacing: 0.05em; }
+  .hint-ico { width: 22px; height: 22px; }
+}
 </style>
 </head>
 <body>
@@ -1278,7 +1283,7 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
     </span>
     <button class="sound-chip on" id="soundToggle" aria-label="Toggle spatial sound">
       <span class="chip-top">spatial</span>
-      <span class="chip-state"><span class="dot"></span><span class="label">sound on</span></span>
+      <span class="chip-state"><svg class="chip-spk" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg><span class="label">sound on</span></span>
     </button>
 
     <!-- Music notes are rendered on the rotatable 3D sphere (#scene canvas).
