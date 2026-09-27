@@ -326,6 +326,17 @@ body::after {
 .card ul li .proj-title { grid-column: 1; grid-row: 1; }
 .card ul li .yrs { grid-column: 2; grid-row: 1; }
 .card ul li .role { grid-column: 1 / -1; grid-row: 2; }
+.card ul li .detail { grid-column: 1 / -1; }   /* auto-places to row 3, under the role */
+
+/* Secondary line under a role — thesis/advisor, coursework, funding */
+.card ul li .detail {
+  display: block;
+  font-family: 'VT323', monospace;
+  color: var(--ink-mute);
+  font-size: 0.95rem;
+  margin-top: 0.14rem;
+  line-height: 1.2;
+}
 
 .card a {
   color: inherit; text-decoration: none;
@@ -1294,47 +1305,60 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
 
 
     <!-- Cards: only AcouXSplat retains a link (the only project URL user provided) -->
+    <article class="card" data-card="interests">
+      <h2>Interests</h2>
+      <ul>
+        <li>
+          <span>
+            <span class="item-title">Primary focus</span>
+            <span class="role">Spatial sound simulation and rendering, spanning classical physics-based approaches to deep learning methods such as neural acoustic fields and Gaussian Splatting.</span>
+          </span>
+        </li>
+        <li>
+          <span>
+            <span class="item-title">Broader</span>
+            <span class="role">Acoustics, DSP, electronics, circuits, and general AI.</span>
+          </span>
+        </li>
+      </ul>
+    </article>
+
     <article class="card" data-card="education">
       <h2>Education</h2>
       <ul>
         <li>
           <span>
             <span class="item-title">KAIST</span>
-            <span class="role">Master of Science, Culture Technology</span>
+            <span class="role">Master of Science, Graduate School of Culture Technology</span>
+            <span class="detail">Thesis: AcouXSplat: Acoustic Explicit Splatting for Room Impulse Responses</span>
+            <span class="detail">Advisor: Sungyoung Kim</span>
           </span>
           <span class="yrs">September 2024 — August 2026</span>
         </li>
         <li>
           <span>
             <span class="item-title">Korea University</span>
-            <span class="role">Bachelor of Computer Science and Engineering</span>
+            <span class="role">Bachelor of Computer Science and Engineering, College of Informatics</span>
           </span>
           <span class="yrs">March 2018 — February 2023</span>
         </li>
         <li>
           <span>
             <span class="item-title">University of Edinburgh</span>
-            <span class="role">Exchange semester, Informatics</span>
+            <span class="role">School of Informatics, College of Science and Engineering</span>
           </span>
           <span class="yrs">January — May 2022</span>
         </li>
       </ul>
     </article>
 
-    <article class="card" data-card="experience">
-      <h2>Experience</h2>
+    <article class="card" data-card="work">
+      <h2>Work</h2>
       <ul>
         <li>
           <span>
-            <span class="item-title">KAIST AIRIS Lab</span>
-            <span class="role">Graduate research student</span>
-          </span>
-          <span class="yrs">September 2024 — Present</span>
-        </li>
-        <li>
-          <span>
             <span class="item-title">Nexon Korea</span>
-            <span class="role">Full-time Audio AI researcher (TTS, TTA), Intelligence Labs</span>
+            <span class="role">Full-time Audio AI Researcher (TTS, TTA) at Intelligence Labs</span>
           </span>
           <span class="yrs">December 2022 — August 2024</span>
         </li>
@@ -1361,43 +1385,36 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
                 <span class="ico-cap">code</span>
               </a>
             </span>
-            <span class="role">Anticipated Master's thesis · adapts 3D Gaussian Splatting to acoustic rendering to predict RIRs at unseen receivers (MeshRIR, TAU-SRIR DB)</span>
+            <span class="role">Master's thesis · adapts 3D Gaussian Splatting to acoustic rendering to predict RIRs at unseen receivers (MeshRIR, TAU-SRIR DB)</span>
           </span>
           <span class="yrs">2026</span>
         </li>
       </ul>
     </article>
 
-    <article class="card" data-card="spatialrhythm">
-      <h2>Dudum Chit <span class="h2-sub">spatial DDR</span></h2>
-      <ul>
-        <li>
-          <span>
-            <span class="proj-title">
-              <span class="ico img-ico" aria-hidden="true">
-                <img src="spatialrhythm.png" alt="">
-              </span>
-            </span>
-            <span class="role">AI-driven XR rhythm game · two AI pipelines generate the note-chart &amp; 8-direction note trajectories; 8-ch surround panning, Unity → Max/MSP over OSC</span>
-          </span>
-          <span class="yrs">Ongoing</span>
-        </li>
-      </ul>
-    </article>
 
     <article class="card" data-card="skills">
       <h2>Skills</h2>
       <ul>
         <li>
-          <span><span class="item-title">Audio &amp; Acoustic AI</span></span>
+          <span>
+            <span class="item-title">Programming</span>
+            <span class="role">C/C++, Python</span>
+          </span>
           <span class="yrs">Skilled</span>
         </li>
         <li>
-          <span><span class="item-title">C / C++, Python, Linux</span></span>
-          <span class="yrs">Skilled</span>
+          <span>
+            <span class="item-title">Audio processing</span>
+            <span class="role">Max/MSP, REAPER, and recording/playback workflows</span>
+          </span>
+          <span class="yrs">Familiar</span>
         </li>
         <li>
-          <span><span class="item-title">MAX/MSP, REAPER, Unity, Arduino, Matlab</span></span>
+          <span>
+            <span class="item-title">Software</span>
+            <span class="role">Unity, Arduino, MATLAB</span>
+          </span>
           <span class="yrs">Familiar</span>
         </li>
       </ul>
@@ -1409,14 +1426,15 @@ body.grabbing, body.grabbing * { cursor: grabbing !important; }
         <li>
           <span>
             <span class="item-title">Nexon Band</span>
-            <span class="role">Bass session</span>
+            <span class="role">Played bass guitar in the band.</span>
           </span>
           <span class="yrs">December 2022 — August 2024</span>
         </li>
         <li>
           <span>
             <span class="item-title">Korea University Acoustic Guitar Club</span>
-            <span class="role">Keyboard &amp; bass, Vice President 2019</span>
+            <span class="role">Played keyboard and bass guitar in the band.</span>
+            <span class="detail">Served as Vice President (May 2019 ~ Nov. 2019)</span>
           </span>
           <span class="yrs">September 2018 — December 2021</span>
         </li>
@@ -1575,10 +1593,10 @@ const CAMZ = 3.4;                        // camera distance (world units) -> per
 
 /* ---------- the notes laid on the sphere ---------- */
 const NOTES = [
+  { card:'interests',  freq:110.00, glyph:'flat',    pos:[-0.82,  0.55,  0.17] },
   { card:'education',  freq:73.42,  glyph:'bass',    pos:[ 0.05,  0.66,  0.75] },
-  { card:'experience', freq:98.00,  glyph:'treble',  pos:[ 0.82,  0.16,  0.55] },
+  { card:'work',       freq:98.00,  glyph:'treble',  pos:[ 0.82,  0.16,  0.55] },
   { card:'acouxsplat',    freq:61.74, icon:'acoux',   tint:[42,60,112], pos:[ 0.62, -0.30, -0.55] },
-  { card:'spatialrhythm', freq:65.41, icon:'spatial', tint:[150,98,60], pos:[ 0.30, -0.70,  0.42] },
   { card:'skills',     freq:82.41,  glyph:'sharp',   pos:[-0.80,  0.08, -0.59] },
   { card:'music',      freq:123.47, glyph:'eighth',  pos:[-0.60, -0.58,  0.55] },
 ];
@@ -1608,6 +1626,8 @@ function glyphContours(type){   // closed polygon outline(s) in the glyph's 0..6
   if(type==='eighth'){ const ang=-18*Math.PI/180, ca=Math.cos(ang), sa=Math.sin(ang), head=[];
     for(let i=0;i<12;i++){ const a=i/12*Math.PI*2, ex=Math.cos(a)*10, ey=Math.sin(a)*7; head.push([32+ex*ca-ey*sa, 32+ex*sa+ey*ca]); }
     return [head, [[40,0],[43,0],[43,32],[40,32]], parsePath('M 42 0 C 58 4 62 14 58 22 C 58 14 50 10 42 10')[0]]; }
+  if(type==='flat'){ const bowl=parsePath('M 26 30 C 42 27 47 39 38 46 C 34 49 29 51 26 53')[0];
+    return [ [[21,6],[26,6],[26,54],[21,54]], ribbon(bowl,5) ]; }
   if(type==='bass'){ const cl=parsePath('M 18 16 C 32 12 44 20 44 32 C 44 44 34 50 22 50 C 18 50 14 46 14 42 C 14 38 18 34 22 34 C 26 34 30 38 30 42')[0];
     return [ribbon(cl,5), circlePoly(52,20,3,6), circlePoly(52,30,3,6)]; }
   if(type==='treble'){ const subs=parsePath('M 38 9 C 33 6 27 9 27 15 C 27 21 33 25 33 31 C 33 40 24 44 24 51 C 24 56 28 59 33 59 C 39 59 42 54 41 49 C 40 45 34 45 33 49 M 33 31 C 26 30 19 34 19 41 C 19 48 26 52 33 51 C 41 50 45 43 43 36 C 41 30 35 28 31 31');
@@ -1630,7 +1650,6 @@ NOTES.forEach(n => {
 const ACOUX_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="6" fill="#1d2a4e"/><circle cx="16" cy="16" r="4" fill="#ee9b1c"/></svg>';
 const projIcons = {
   acoux:   Object.assign(new Image(), { src: 'data:image/svg+xml;utf8,' + encodeURIComponent(ACOUX_SVG) }),
-  spatial: Object.assign(new Image(), { src: 'spatialrhythm.png' }),
 };
 
 /* ---------- layout: centre everything on the cat ---------- */
